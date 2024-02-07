@@ -16,7 +16,7 @@ class MQTTClient(context: Context,
         options.isAutomaticReconnect = true
         options.connectionTimeout = 0
         options.keepAliveInterval = 0
-        options.maxReconnectDelay = 5000
+        options.maxReconnectDelay = 1000
 
         try {
             mqttClient.connect(options, null, cbConnect)
@@ -72,5 +72,9 @@ class MQTTClient(context: Context,
         } catch (e: MqttException) {
             e.printStackTrace()
         }
+    }
+
+    fun isConnected(): Boolean {
+        return this.mqttClient.isConnected
     }
 }

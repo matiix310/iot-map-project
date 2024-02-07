@@ -6,12 +6,17 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
-import android.view.WindowManager
+import android.widget.Button
+import org.eclipse.paho.client.mqttv3.IMqttActionListener
+import org.eclipse.paho.client.mqttv3.IMqttToken
+import kotlin.math.atan
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 
-class Canvas(context: Context, private var windowManager: WindowManager): View(context) {
+class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context, attrSet) {
 
     private val paint = Paint()
     private val vehicleWidth = 100
@@ -20,8 +25,53 @@ class Canvas(context: Context, private var windowManager: WindowManager): View(c
 
     private val obstacles = ArrayList<Point>()
     private var orientation = 0f
-    private val position: Point = Point(200, -100)
+    private val position: Point = Point(0, 0)
     private var vehicleColor = Color.RED;
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            val dx = event.x - width / 2
+            val dy = -event.y + height / 2
+
+            Log.d("dx", dx.toString())
+            Log.d("dy", dy.toString())
+            var angle = (((atan(dx / dy) - orientation) / Math.PI) * 180).toInt()
+            val distance = sqrt(dx * dx + dy * dy).toInt()
+
+            if (dy < 0) {
+                if (dx > 0) {
+                    angle += 180
+                } else {
+                    angle -= 180
+                }
+            }
+
+
+            MainActivity.mqttClient.publish("Lego/Status", msg = "T${angle}", cbPublish = object: IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                }
+            })
+
+            MainActivity.mqttClient.publish("Lego/Status", msg = "S${distance}", cbPublish = object: IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                }
+            })
+
+            // Turn: T`angle`
+            // Move: D`distance`
+        }
+        return this.performClick()
+    }
+
+    override fun performClick(): Boolean {
+        return super.performClick()
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -34,19 +84,22 @@ class Canvas(context: Context, private var windowManager: WindowManager): View(c
 
         for (obstacle in obstacles) {
             canvas.drawPoint(
-                windowManager.defaultDisplay.width / 2 - position.x + obstacle.x.toFloat(),
-                windowManager.defaultDisplay.height / 2 + position.y - obstacle.y.toFloat(),
+                width / 2 - position.x + obstacle.x.toFloat(),
+                height / 2 + position.y - obstacle.y.toFloat(),
                 paint)
         }
 
         // Draw the vehicle
         paint.color = vehicleColor
-        val x = (windowManager.defaultDisplay.width - vehicleWidth) / 2
-        val y = (windowManager.defaultDisplay.height - vehicleHeight) / 2
+        val x = (width - vehicleWidth) / 2
+        val y = (height - vehicleHeight) / 2
         val rect = Rect(x, y, x + vehicleWidth, y + vehicleHeight)
 
         canvas.save()
-        canvas.rotate(orientation, windowManager.defaultDisplay.width / 2f, windowManager.defaultDisplay.height / 2f)
+        canvas.rotate(
+            orientation,
+            width / 2f,
+            height / 2f)
         canvas.drawRect(rect, paint)
         canvas.restore()
     }
@@ -75,6 +128,14 @@ class Canvas(context: Context, private var windowManager: WindowManager): View(c
 
     fun changeVehicleColor(color: Int) {
         vehicleColor = color
+        invalidate()
+    }
+
+    fun reset() {
+        position.x = 0
+        position.y = 0
+        orientation = 0f
+        obstacles.clear()
         invalidate()
     }
 }

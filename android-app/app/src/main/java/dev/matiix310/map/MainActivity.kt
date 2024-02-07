@@ -4,7 +4,13 @@ import MQTTClient
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.AttributeSet
 import android.util.Log
+import android.view.View
+import android.view.WindowManager
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
@@ -16,11 +22,16 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 
 class MainActivity : ComponentActivity() {
     lateinit var canvas: Canvas;
-    lateinit var mqttClient: MQTTClient
     val context: Context = this;
+
+    companion object {
+        lateinit var mqttClient: MQTTClient
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_canvas);
+        canvas = findViewById(R.id.canvas)
 
         val intent = intent
         val ip = intent.getStringExtra("ip")
@@ -97,6 +108,20 @@ class MainActivity : ComponentActivity() {
                 override fun connectionLost(cause: Throwable?) {
                     Log.d(this.javaClass.name, "Connection lost ${cause.toString()}")
                     canvas.changeVehicleColor(Color.RED)
+
+                    val mainHandler = Handler(Looper.getMainLooper())
+
+                    mainHandler.post(object : Runnable {
+                        override fun run() {
+                            if (mqttClient.isConnected()) {
+                                canvas.changeVehicleColor(Color.GREEN)
+                            } else {
+                                canvas.changeVehicleColor(Color.RED)
+                                mainHandler.postDelayed(this, 1000)
+                            }
+                        }
+                    })
+
                 }
 
                 override fun deliveryComplete(token: IMqttDeliveryToken?) {
@@ -104,7 +129,20 @@ class MainActivity : ComponentActivity() {
                 }
             })
 
-        canvas = Canvas(this, windowManager);
-        setContentView(canvas);
+        val resetButton = findViewById<Button>(R.id.reset_button)
+
+        resetButton.setOnClickListener { canvas.reset() }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mqttClient.disconnect(object: IMqttActionListener {
+            override fun onSuccess(asyncActionToken: IMqttToken?) {
+            }
+
+            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+            }
+        })
     }
 }
