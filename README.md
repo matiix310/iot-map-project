@@ -5,7 +5,7 @@ Map is a group final project for the *Fundamentals of IOT* course at *Centria UA
 ## 📜 Documentation
 
 ### Android app: **Map**
-**Map** is connected to the mqtt server and receive all the messages related to the robot sensors. It dispays the robot position, the obstacles and colors it has detected on the ground.
+**Map** is connected to the MQTT server and recieve all the messages related to the robot sensors. It dispays the robot position, the obstacles and the colors it has detected on the ground.
 
 -> [Documentation](https://github.com/matiix310/iot-map-project/tree/main/android-app)
 
