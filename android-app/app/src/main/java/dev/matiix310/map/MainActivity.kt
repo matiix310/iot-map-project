@@ -6,10 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.AttributeSet
 import android.util.Log
-import android.view.View
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -46,57 +43,7 @@ class MainActivity : ComponentActivity() {
                     Toast.makeText(context, "MQTT Connection success", Toast.LENGTH_SHORT).show()
                     canvas.changeVehicleColor(Color.GREEN)
 
-                    mqttClient.subscribe("Lego/Distance", cbSubscribe = object: IMqttActionListener {
-                        override fun onSuccess(asyncActionToken: IMqttToken?) {
-                            Log.d(this.javaClass.name, "Subscribed to Lego/Distance")
-                        }
-
-                        override fun onFailure(
-                            asyncActionToken: IMqttToken?,
-                            exception: Throwable?
-                        ) {
-                            Log.d(this.javaClass.name, "Failed to subscribed to Lego/Distance: " + exception.toString())
-                        }
-                    });
-
-                    mqttClient.subscribe("Lego/Turn", cbSubscribe = object: IMqttActionListener {
-                        override fun onSuccess(asyncActionToken: IMqttToken?) {
-                            Log.d(this.javaClass.name, "Subscribed to Lego/Turn")
-                        }
-
-                        override fun onFailure(
-                            asyncActionToken: IMqttToken?,
-                            exception: Throwable?
-                        ) {
-                            Log.d(this.javaClass.name, "Failed to subscribed to Lego/Turn: " + exception.toString())
-                        }
-                    });
-
-                    mqttClient.subscribe("Lego/Move", cbSubscribe = object: IMqttActionListener {
-                        override fun onSuccess(asyncActionToken: IMqttToken?) {
-                            Log.d(this.javaClass.name, "Subscribed to Lego/Move")
-                        }
-
-                        override fun onFailure(
-                            asyncActionToken: IMqttToken?,
-                            exception: Throwable?
-                        ) {
-                            Log.d(this.javaClass.name, "Failed to subscribed to Lego/Move: " + exception.toString())
-                        }
-                    });
-
-                    mqttClient.subscribe("Map/Walls", cbSubscribe = object: IMqttActionListener {
-                        override fun onSuccess(asyncActionToken: IMqttToken?) {
-                            Log.d(this.javaClass.name, "Subscribed to Map/Walls")
-                        }
-
-                        override fun onFailure(
-                            asyncActionToken: IMqttToken?,
-                            exception: Throwable?
-                        ) {
-                            Log.d(this.javaClass.name, "Failed to subscribed to Map/Walls: " + exception.toString())
-                        }
-                    });
+                    subscribe()
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
@@ -108,14 +55,14 @@ class MainActivity : ComponentActivity() {
             },
             object : MqttCallback {
                 override fun messageArrived(topic: String?, message: MqttMessage?) {
-                    val msg = "Receive message: ${message.toString()} from topic: $topic"
+                    val msg = "Receive message: '${message.toString()}' from topic: $topic"
                     Log.d(this.javaClass.name, msg)
 
                     when (topic) {
                         "Lego/Distance" -> canvas.placeObstacle(message.toString().toInt())
-                        "Lego/Turn" -> canvas.turnVehicle(message.toString().toFloat())
-                        "Lego/Move" -> canvas.moveVehicle(message.toString().toInt())
-                        "Map/Walls" -> canvas.setWalls(message.toString())
+                        "Map/Robot" -> canvas.setVehicle(message.toString())
+                        "Map/Obstacles" -> canvas.addObstacles(message.toString())
+                        "Map/Reset" -> canvas.reset();
                     }
                 }
 
@@ -129,6 +76,7 @@ class MainActivity : ComponentActivity() {
                         override fun run() {
                             if (mqttClient.isConnected()) {
                                 canvas.changeVehicleColor(Color.GREEN)
+                                subscribe()
                             } else {
                                 canvas.changeVehicleColor(Color.RED)
                                 mainHandler.postDelayed(this, 1000)
@@ -145,8 +93,14 @@ class MainActivity : ComponentActivity() {
 
         val resetButton = findViewById<Button>(R.id.reset_button)
 
-        resetButton.setOnClickListener { canvas.reset() }
+        resetButton.setOnClickListener { mqttClient.publish("Client/Reset", "") }
+    }
 
+    private fun subscribe() {
+        mqttClient.subscribe("Lego/Distance")
+        mqttClient.subscribe("Map/Robot")
+        mqttClient.subscribe("Map/Obstacles")
+        mqttClient.subscribe("Map/Reset")
     }
 
     override fun onDestroy() {

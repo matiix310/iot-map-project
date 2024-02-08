@@ -1,4 +1,5 @@
 import android.content.Context
+import android.util.Log
 import info.mqtt.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 
@@ -7,8 +8,16 @@ class MQTTClient(context: Context,
                  clientID: String = "") {
     private var mqttClient = MqttAndroidClient(context, serverURI, clientID)
 
+    private companion object defaultActionListener: IMqttActionListener {
+        override fun onSuccess(asyncActionToken: IMqttToken?) {
+        }
+
+        override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+        }
+    }
+
     fun connect(
-        cbConnect: IMqttActionListener,
+        cbConnect: IMqttActionListener = defaultActionListener,
         cbClient: MqttCallback
     ) {
         mqttClient.setCallback(cbClient)
@@ -28,7 +37,7 @@ class MQTTClient(context: Context,
     fun subscribe(
         topic: String,
         qos: Int = 1,
-        cbSubscribe: IMqttActionListener
+        cbSubscribe: IMqttActionListener = defaultActionListener
     ) {
         try {
             mqttClient.subscribe(topic, qos, null, cbSubscribe)
@@ -37,9 +46,24 @@ class MQTTClient(context: Context,
         }
     }
 
+    fun subscribe(topic: String) {
+        this.subscribe(topic, cbSubscribe = object: IMqttActionListener {
+            override fun onSuccess(asyncActionToken: IMqttToken?) {
+                Log.d(this.javaClass.name, "Subscribed to $topic")
+            }
+
+            override fun onFailure(
+                asyncActionToken: IMqttToken?,
+                exception: Throwable?
+            ) {
+                Log.d(this.javaClass.name, "Failed to subscribed to $topic: " + exception.toString())
+            }
+        });
+    }
+
     fun unsubscribe(
         topic: String,
-        cbUnsubscribe: IMqttActionListener
+        cbUnsubscribe: IMqttActionListener = defaultActionListener
     ) {
         try {
             mqttClient.unsubscribe(topic, null, cbUnsubscribe)
@@ -53,7 +77,7 @@ class MQTTClient(context: Context,
         msg: String,
         qos: Int = 1,
         retained: Boolean = false,
-        cbPublish: IMqttActionListener
+        cbPublish: IMqttActionListener = defaultActionListener
     ) {
         try {
             val message = MqttMessage()

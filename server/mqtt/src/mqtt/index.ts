@@ -55,22 +55,36 @@ export default class MqttServer {
     return { mqtt: this.mqttServer.listening, http: this.mqttServer.listening };
   }
 
+  private defaultErrCallback(error?: Error | undefined) {
+    if (error) console.log(error);
+  }
+
   publish(
     topic: string,
     payload: Buffer | string,
-    callback: (error?: Error | undefined) => void
+    callback: (error?: Error | undefined) => void = this.defaultErrCallback
   ) {
     this.aedesClient.publish(
       {
         cmd: "publish",
-        messageId: 42,
-        qos: 2,
-        dup: false,
-        topic,
+        messageId: Math.round(Math.random() * 1000),
         payload,
         retain: false,
+        dup: false,
+        topic,
+        qos: 1,
       },
       callback
+    );
+  }
+
+  subscribe(topic: string) {
+    this.aedesClient.subscribe(
+      topic,
+      (e: any) => {
+        e();
+      },
+      () => {}
     );
   }
 }

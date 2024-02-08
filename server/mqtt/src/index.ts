@@ -3,13 +3,14 @@ import Map from "./map";
 
 const mqttPort = 1883;
 const wsPort = 9001;
+const blacklistTopic = ["Map/Obstacles", "Map/Robot"];
 
 // MQTT Server
 const mqttServer = new MqttServer(mqttPort, wsPort);
 
 // Map
-const map = new Map();
-map.connectToMqtt(mqttServer);
+const map = new Map(mqttServer);
+map.connectToMqtt();
 
 mqttServer.aedesClient.on("client", (client) => {
   console.log("New client: " + client.id);
@@ -20,13 +21,13 @@ mqttServer.aedesClient.on("clientDisconnect", (client) => {
 });
 
 mqttServer.aedesClient.on("publish", (event, client) => {
-  if (event.topic.startsWith("$SYS")) return;
-  console.log(`[${client?.id}] [${event.topic}]: ${event.payload}`);
+  if (event.topic.startsWith("$SYS") || blacklistTopic.includes(event.topic)) return;
+  console.log(`[${client?.id ?? "server"}] [${event.topic}]: ${event.payload}`);
 });
 
 mqttServer.aedesClient.on("subscribe", (subscrptions, client) => {
   console.log(
-    client.id + "subscribed to: " + subscrptions.map((sub) => sub.topic).join(", ")
+    client.id + " subscribed to: " + subscrptions.map((sub) => sub.topic).join(", ")
   );
 });
 
