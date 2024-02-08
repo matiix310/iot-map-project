@@ -20,8 +20,14 @@ mqttServer.aedesClient.on("clientDisconnect", (client) => {
 });
 
 mqttServer.aedesClient.on("publish", (event, client) => {
-  if (!client) return;
+  if (event.topic.startsWith("$SYS")) return;
   console.log(`[${client?.id}] [${event.topic}]: ${event.payload}`);
+});
+
+mqttServer.aedesClient.on("subscribe", (subscrptions, client) => {
+  console.log(
+    client.id + "subscribed to: " + subscrptions.map((sub) => sub.topic).join(", ")
+  );
 });
 
 mqttServer
@@ -30,7 +36,7 @@ mqttServer
       console.log("Aedes MQTT server started and listening on port", mqttPort);
     },
     () => {
-      console.log("websocket server listening on port ", wsPort);
+      console.log("Websocket server listening on port ", wsPort);
     }
   )
   .catch(() =>

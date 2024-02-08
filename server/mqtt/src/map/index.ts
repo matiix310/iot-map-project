@@ -26,43 +26,65 @@ export default class Map {
   }
 
   connectToMqtt(mqttServer: MqttServer) {
+    mqttServer.aedesClient.on("publish", (event, client) => {
+      if (event.topic.startsWith("$SYS")) return;
+      switch (event.topic) {
+        case "Lego/Distance":
+          {
+            const distance = parseInt(event.payload.toString());
+            const radOrientation = (this.orientation / 180) * Math.PI;
+            const newDistance = distance + this.vehicleHeight / 2;
+            this.obstacles.push({
+              x: Math.round(this.position.x + Math.sin(radOrientation) * newDistance),
+              y: Math.round(this.position.y + Math.cos(radOrientation) * newDistance),
+            });
+            console.log("New obstacles!");
+          }
+          break;
+
+        case "Lego/Move":
+          {
+            const distance = parseInt(event.payload.toString());
+            const radOrientation = (this.orientation / 180) * Math.PI;
+            this.position.x += Math.round(Math.sin(radOrientation) * distance);
+            this.position.y += Math.round(Math.cos(radOrientation) * distance);
+          }
+          break;
+
+        case "Lego/Turn":
+          {
+            const degree = parseInt(event.payload.toString());
+            this.orientation += degree;
+          }
+          break;
+
+        default:
+          break;
+      }
+    });
+
     mqttServer.aedesClient.subscribe(
       "Lego/Distance",
-      (e) => {
-        const distance = parseInt(e.payload.toString());
-        const radOrientation = (this.orientation / 180) * Math.PI;
-        const newDistance = distance + this.vehicleHeight / 2;
-        this.obstacles.push({
-          x: Math.round(this.position.x + Math.sin(radOrientation) * newDistance),
-          y: Math.round(this.position.y + Math.cos(radOrientation) * newDistance),
-        });
-      },
+      () => {},
       () => {}
     );
 
     mqttServer.aedesClient.subscribe(
       "Lego/Move",
-      (e) => {
-        const distance = parseInt(e.payload.toString());
-        const radOrientation = (this.orientation / 180) * Math.PI;
-        this.position.x += Math.round(Math.sin(radOrientation) * distance);
-        this.position.y += Math.round(Math.cos(radOrientation) * distance);
-      },
+      () => {},
       () => {}
     );
 
     mqttServer.aedesClient.subscribe(
       "Lego/Turn",
-      (e) => {
-        const degree = parseInt(e.payload.toString());
-        this.orientation += degree;
-      },
+      () => {},
       () => {}
     );
 
     setInterval(() => {
       const start = Date.now();
       this.computeWalls();
+      console.log(this.walls.length);
       if (this.walls.length !== 0)
         mqttServer.publish(
           "Map/Walls",
@@ -80,7 +102,7 @@ export default class Map {
         this.worstTime = elapsedTime;
         console.log(`Worst elapsed time! (${elapsedTime})`);
       }
-    }, 200);
+    }, 1000);
   }
 
   private computeWalls() {

@@ -1,4 +1,4 @@
-import aedes, { Client } from "aedes";
+import aedes from "aedes";
 import net from "net";
 import http from "http";
 import ws from "websocket-stream";
