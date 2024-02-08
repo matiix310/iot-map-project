@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CMD='mosquitto_pub -p 1883 -h localhost -I controller -t '
+CMD='mosquitto_pub -p 1883 -h local -I controller -t '
 array=("Distance" "Move" "Turn")
 
 error() {

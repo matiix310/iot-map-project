@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Rect
 import android.util.Log
 import android.view.MotionEvent
@@ -19,11 +20,14 @@ import kotlin.math.sqrt
 class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context, attrSet) {
 
     private val paint = Paint()
+    private val path = Path()
+
     private val vehicleWidth = 100
     private val vehicleHeight = 150
     private val obstacleWidth = 20f
 
     private val obstacles = ArrayList<Point>()
+    private var walls: List<List<Point>> = emptyList();
     private var orientation = 0f
     private val position: Point = Point(0, 0)
     private var vehicleColor = Color.RED;
@@ -76,8 +80,6 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        Log.d("coucou", "Draw is called!")
-
         // Draw the obstacles
         paint.color = Color.RED
         paint.strokeWidth = obstacleWidth
@@ -87,6 +89,18 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
                 width / 2 - position.x + obstacle.x.toFloat(),
                 height / 2 + position.y - obstacle.y.toFloat(),
                 paint)
+        }
+
+        // draw the walls
+        paint.color = Color.BLUE
+
+        for (wall in walls) {
+            val start = absoluteToRelativePosition(wall[0])
+            path.moveTo(start.x.toFloat(), start.y.toFloat())
+            for (i in 1..wall.size) {
+                val destination = absoluteToRelativePosition(wall[i])
+                path.lineTo(destination.x.toFloat(), destination.y.toFloat())
+            }
         }
 
         // Draw the vehicle
@@ -102,6 +116,13 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
             height / 2f)
         canvas.drawRect(rect, paint)
         canvas.restore()
+    }
+
+    private fun absoluteToRelativePosition(point: Point): Point {
+        return Point(
+            width / 2 + point.x - position.x,
+            height / 2 - point.y - position.y
+        )
     }
 
     fun placeObstacle(distance: Int) {
@@ -137,6 +158,16 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
         orientation = 0f
         obstacles.clear()
         invalidate()
+    }
+
+    fun setWalls(rowWalls: String) {
+        this.walls = rowWalls.split("|").map {
+            it.split(",").map {
+                val position = it.split("/")
+                Point(position[0].toInt(), position[1].toInt());
+            }
+        };
+        this.obstacles.clear()
     }
 }
 

@@ -84,6 +84,19 @@ class MainActivity : ComponentActivity() {
                             Log.d(this.javaClass.name, "Failed to subscribed to Lego/Move: " + exception.toString())
                         }
                     });
+
+                    mqttClient.subscribe("Map/Walls", cbSubscribe = object: IMqttActionListener {
+                        override fun onSuccess(asyncActionToken: IMqttToken?) {
+                            Log.d(this.javaClass.name, "Subscribed to Map/Walls")
+                        }
+
+                        override fun onFailure(
+                            asyncActionToken: IMqttToken?,
+                            exception: Throwable?
+                        ) {
+                            Log.d(this.javaClass.name, "Failed to subscribed to Map/Walls: " + exception.toString())
+                        }
+                    });
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
@@ -102,6 +115,7 @@ class MainActivity : ComponentActivity() {
                         "Lego/Distance" -> canvas.placeObstacle(message.toString().toInt())
                         "Lego/Turn" -> canvas.turnVehicle(message.toString().toFloat())
                         "Lego/Move" -> canvas.moveVehicle(message.toString().toInt())
+                        "Map/Walls" -> canvas.setWalls(message.toString())
                     }
                 }
 

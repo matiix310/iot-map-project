@@ -3,8 +3,6 @@ import net from "net";
 import http from "http";
 import ws from "websocket-stream";
 
-type Listener = "client" | "clientDisconnect" | "subscribe" | "unsubscribe" | "publish";
-
 export default class MqttServer {
   private mqttServer: net.Server;
   private httpServer: http.Server<
@@ -27,10 +25,25 @@ export default class MqttServer {
     ws.createServer({ server: this.httpServer }, this.aedesClient.handle as any);
   }
 
-  start(mqttCallback: () => void, wsCallback: () => void) {
-    this.mqttServer.listen(this.mqttPort, mqttCallback);
+  async start(mqttCallback: () => void, wsCallback: () => void): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let mqtt = false;
+      let ws = false;
+      this.mqttServer.listen(this.mqttPort, () => {
+        mqtt = true;
+        mqttCallback();
+        if (ws) resolve();
+      });
+      this.httpServer.listen(this.wsPort, () => {
+        ws = true;
+        wsCallback();
+        if (mqtt) resolve();
+      });
 
-    this.httpServer.listen(this.wsPort, wsCallback);
+      setTimeout(() => {
+        reject();
+      }, 5000);
+    });
   }
 
   stop() {
@@ -40,5 +53,24 @@ export default class MqttServer {
 
   isListening(): { mqtt: Boolean; http: Boolean } {
     return { mqtt: this.mqttServer.listening, http: this.mqttServer.listening };
+  }
+
+  publish(
+    topic: string,
+    payload: Buffer | string,
+    callback: (error?: Error | undefined) => void
+  ) {
+    this.aedesClient.publish(
+      {
+        cmd: "publish",
+        messageId: 42,
+        qos: 2,
+        dup: false,
+        topic,
+        payload,
+        retain: false,
+      },
+      callback
+    );
   }
 }
