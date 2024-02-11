@@ -10,6 +10,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import org.eclipse.paho.client.mqttv3.BufferedMessage
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
@@ -56,12 +57,14 @@ class MainActivity : ComponentActivity() {
             object : MqttCallback {
                 override fun messageArrived(topic: String?, message: MqttMessage?) {
                     val msg = "Receive message: '${message.toString()}' from topic: $topic"
-                    Log.d(this.javaClass.name, msg)
+                    // Log.d(this.javaClass.name, msg)
+
+                    if (message == null)
+                        return;
 
                     when (topic) {
-                        "Lego/Distance" -> canvas.placeObstacle(message.toString().toInt())
                         "Map/Robot" -> canvas.setVehicle(message.toString())
-                        "Map/Obstacles" -> canvas.addObstacles(message.toString())
+                        "Map/Obstacles" -> canvas.addObstacles(message.payload)
                         "Map/Reset" -> canvas.reset();
                     }
                 }
@@ -97,7 +100,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun subscribe() {
-        mqttClient.subscribe("Lego/Distance")
         mqttClient.subscribe("Map/Robot")
         mqttClient.subscribe("Map/Obstacles")
         mqttClient.subscribe("Map/Reset")

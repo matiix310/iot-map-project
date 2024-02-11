@@ -4,14 +4,15 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.Rect
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
+import java.math.BigInteger
+import kotlin.experimental.and
+import kotlin.experimental.or
 import kotlin.math.atan
 import kotlin.math.cos
 import kotlin.math.sin
@@ -23,7 +24,7 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
 
     private val vehicleWidth = 100
     private val vehicleHeight = 150
-    private val obstacleWidth = 50f
+    private val obstacleWidth = 7f
 
     private val obstacles = ArrayList<Point>()
     private var orientation = 0f
@@ -115,16 +116,6 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
         )
     }
 
-    fun placeObstacle(distance: Int) {
-        val radOrientation = 2f * (orientation / 360f) * Math.PI
-        val newDistance = distance + vehicleHeight / 2
-        obstacles.add(Point(
-            position.x + (sin(radOrientation) * newDistance).toInt(),
-            position.y + (cos(radOrientation) * newDistance).toInt()
-        ))
-        invalidate()
-    }
-
     fun setVehicle(vehicleInfo: String) {
         val data = vehicleInfo.split('|')
         this.position.x = data[0].toInt()
@@ -146,11 +137,24 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
         invalidate()
     }
 
-    fun addObstacles(rowObstacles: String) {
-        this.obstacles.addAll(rowObstacles.split('|').map {
+    @OptIn(ExperimentalStdlibApi::class)
+    fun addObstacles(rowObstacles: ByteArray) {
+        this.obstacles.clear()
+        val obstaclesCount = rowObstacles.size / 4
+
+        for (i in 0..<obstaclesCount) {
+            this.obstacles.add(
+                Point(
+                    BigInteger(rowObstacles.slice(i*4..i*4+1).toByteArray()).toInt(),
+                    BigInteger(rowObstacles.slice(i*4+2..i*4+3).toByteArray()).toInt()
+                )
+            )
+        }
+
+        /* this.obstacles.addAll(rowObstacles.split('|').map {
             val position = it.split('/')
             Point(position[0].toInt(), position[1].toInt())
-        })
+        }) */
         invalidate()
     }
 }
