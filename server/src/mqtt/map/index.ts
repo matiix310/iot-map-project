@@ -107,10 +107,6 @@ class Map {
       this.orientation %= 360;
 
       if (!this.badapple) {
-        // Obstacles list
-        const buffer = this.getBufferFromObstacles(this.obstacles);
-        this.mqttServer.publish("Map/Obstacles", buffer);
-
         // Robot infos
         this.mqttServer.publish(
           "Map/Robot",
@@ -118,6 +114,10 @@ class Map {
             this.orientation
           }`
         );
+
+        // Obstacles list
+        const buffer = this.getBufferFromObstacles(this.obstacles);
+        this.mqttServer.publish("Map/Obstacles", buffer);
       }
 
       // Debug
