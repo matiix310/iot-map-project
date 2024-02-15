@@ -1,20 +1,25 @@
 import MapServer from "mqtt";
-import App from "../../";
 import express from "express";
 const router = express.Router();
 
-const routesList = ["/badapple"];
+const routesList = ["badapple", "status"];
 
 export default function (mapServer: MapServer) {
-  router.get("/", (req, res) => {
-    res.json({ endpoints: routesList });
+  router.get("/", (_, res) => {
+    res.send(
+      routesList.map((link) => `<a href="/api/${link}">${link}</a>`).join("<br/>")
+    );
   });
 
-  router.get("/badapple", async (req, res) => {
+  router.get("/badapple", async (_, res) => {
     if (mapServer.playBadApple()) {
       await new Promise((r) => setTimeout(r, 1000));
       res.redirect("/static/badapple.mp4");
     } else res.send("Error, can't start Bad Apple!");
+  });
+
+  router.get("/status", (_, res) => {
+    res.json(mapServer.status());
   });
 
   return router;

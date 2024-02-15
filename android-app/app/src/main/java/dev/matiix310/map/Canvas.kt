@@ -38,7 +38,7 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
 
             Log.d("dx", dx.toString())
             Log.d("dy", dy.toString())
-            var angle = (((atan(dx / dy) - orientation) / Math.PI) * 180).toInt()
+            var angle = (((atan(dx / dy)) / Math.PI) * 180 - orientation).toInt()
             val distance = sqrt(dx * dx + dy * dy).toInt()
 
             if (dy < 0) {
@@ -60,6 +60,7 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
 
             MainActivity.mqttClient.publish("Lego/Status", msg = "S${distance}", cbPublish = object: IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
+
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {

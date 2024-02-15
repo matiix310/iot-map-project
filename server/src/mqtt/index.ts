@@ -1,9 +1,9 @@
 import MqttServer from "./mqttServer";
-import Map from "./map";
+import Map, { Location } from "./map";
 
 const blacklistTopic = ["Map/Obstacles", "Map/Robot"];
 
-export default class MapServer {
+class MapServer {
   mqttPort: number;
   wsPort: number;
 
@@ -63,4 +63,31 @@ export default class MapServer {
     this.map.playBadApple();
     return true;
   }
+
+  status(): Status {
+    if (!this.map)
+      return {
+        error: true,
+        message: "The map is not loaded. Please try again later.",
+      };
+    return {
+      error: false,
+      position: this.map.position,
+      orientation: this.map.orientation,
+    };
+  }
 }
+
+type Status =
+  | {
+      error: true;
+      message: string;
+    }
+  | {
+      error: false;
+      position: Location;
+      orientation: number;
+    };
+
+export default MapServer;
+export type { Status };

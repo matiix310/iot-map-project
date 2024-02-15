@@ -16,9 +16,7 @@ export default class App {
   }
 
   start() {
-    this.app.get("/", (req, res) => {
-      res.send("Hi there");
-    });
+    this.app.use("/", express.static("src/app/public"));
 
     this.app.use("/api", getApiRouter(this.mapServer));
 

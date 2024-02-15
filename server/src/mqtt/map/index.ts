@@ -8,13 +8,13 @@ type Location = {
   y: number;
 };
 
-export default class Map {
+class Map {
   // Map
   private obstacles: Location[];
 
   // Robot
-  private orientation: number;
-  private position: Location;
+  orientation: number;
+  position: Location;
 
   // Debug
   private worstTime: number;
@@ -187,3 +187,6 @@ export default class Map {
     return buffer;
   }
 }
+
+export default Map;
+export type { Location };
