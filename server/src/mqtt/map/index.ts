@@ -10,7 +10,7 @@ type Location = {
 
 class Map {
   // Map
-  private obstacles: Location[];
+  obstacles: Location[];
 
   // Robot
   orientation: number;

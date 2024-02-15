@@ -22,5 +22,9 @@ export default function (mapServer: MapServer) {
     res.json(mapServer.status());
   });
 
+  router.get("/obstacles", (_, res) => {
+    res.json(mapServer.obstacles());
+  });
+
   return router;
 }

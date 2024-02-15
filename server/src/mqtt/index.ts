@@ -64,7 +64,7 @@ class MapServer {
     return true;
   }
 
-  status(): Status {
+  status(): RequestJson<{ position: Location; orientation: number }> {
     if (!this.map)
       return {
         error: true,
@@ -72,22 +72,35 @@ class MapServer {
       };
     return {
       error: false,
-      position: this.map.position,
-      orientation: this.map.orientation,
+      data: {
+        position: this.map.position,
+        orientation: this.map.orientation,
+      },
+    };
+  }
+
+  obstacles(): RequestJson<Location[]> {
+    if (!this.map)
+      return {
+        error: true,
+        message: "The map is not loaded. Please try again later.",
+      };
+    return {
+      error: false,
+      data: this.map.obstacles,
     };
   }
 }
 
-type Status =
+type RequestJson<T> =
   | {
       error: true;
       message: string;
     }
   | {
       error: false;
-      position: Location;
-      orientation: number;
+      data: T;
     };
 
 export default MapServer;
-export type { Status };
+export type { RequestJson };
