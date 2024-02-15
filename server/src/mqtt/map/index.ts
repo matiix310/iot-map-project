@@ -75,7 +75,7 @@ class Map {
 
         case "Lego/Turn":
           {
-            const degree = parseInt(event.payload.toString());
+            const degree = parseFloat(event.payload.toString());
             this.orientation += degree;
           }
           break;
