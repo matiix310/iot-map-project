@@ -104,6 +104,8 @@ class Map {
     setInterval(() => {
       const start = Date.now();
 
+      this.orientation %= 360;
+
       if (!this.badapple) {
         // Obstacles list
         const buffer = this.getBufferFromObstacles(this.obstacles);
