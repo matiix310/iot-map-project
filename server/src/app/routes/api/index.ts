@@ -2,7 +2,7 @@ import MapServer from "mqtt";
 import express from "express";
 const router = express.Router();
 
-const routesList = ["badapple", "status"];
+const routesList = ["badapple", "status", "obstacles"];
 
 export default function (mapServer: MapServer) {
   router.get("/", (_, res) => {
