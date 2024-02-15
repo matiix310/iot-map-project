@@ -44,7 +44,7 @@ class Map {
       switch (event.topic) {
         case "Lego/Distance":
           {
-            const distance = parseInt(event.payload.toString());
+            const distance = parseFloat(event.payload.toString());
             const radOrientation = (this.orientation / 180) * Math.PI;
             const newDistance = distance + this.vehicleHeight / 2;
             const newObstacle = {
@@ -66,10 +66,10 @@ class Map {
 
         case "Lego/Move":
           {
-            const distance = parseInt(event.payload.toString());
+            const distance = parseFloat(event.payload.toString());
             const radOrientation = (this.orientation / 180) * Math.PI;
-            this.position.x += Math.round(Math.sin(radOrientation) * distance);
-            this.position.y += Math.round(Math.cos(radOrientation) * distance);
+            this.position.x += Math.sin(radOrientation) * distance;
+            this.position.y += Math.cos(radOrientation) * distance;
           }
           break;
 
