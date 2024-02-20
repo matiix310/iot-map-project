@@ -25,10 +25,11 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
     private val vehicleWidth = 100
     private val vehicleHeight = 150
     private val obstacleWidth = 7f
+    private val frontHeight = 100;
 
-    private val obstacles = ArrayList<Point>()
+    private val obstacles = ArrayList<PointF>()
     private var orientation = 0f
-    private val position: Point = Point(0, 0)
+    private val position: Point = Point(0f, 0f)
     private var vehicleColor = Color.RED;
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -38,7 +39,7 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
 
             Log.d("dx", dx.toString())
             Log.d("dy", dy.toString())
-            var angle = (((atan(dx / dy)) / Math.PI) * 180 - orientation).toInt()
+            var angle = (((atan(dx / dy)) / Math.PI) * 180).toFloat()
             val distance = sqrt(dx * dx + dy * dy).toInt()
 
             if (dy < 0) {
@@ -49,6 +50,11 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
                 }
             }
 
+            angle = (angle - orientation) % 360;
+
+            if (angle > 180) {
+                angle = 180 - angle
+            }
 
             MainActivity.mqttClient.publish("Lego/Status", msg = "T${angle}", cbPublish = object: IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
@@ -94,23 +100,29 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
         }
 
         // Draw the vehicle
-        paint.color = vehicleColor
-        paint.style = Paint.Style.FILL
 
         val x = (width - vehicleWidth) / 2
         val y = (height - vehicleHeight) / 2
-        val rect = Rect(x, y, x + vehicleWidth, y + vehicleHeight)
+        val vehicleRect = Rect(x, y, x + vehicleWidth, y + vehicleHeight)
+
+        // Draw the front of the vehicle
+        val frontRect = Rect(x, y - frontHeight, x + vehicleWidth, y)
 
         canvas.save()
         canvas.rotate(
             orientation,
             width / 2f,
             height / 2f)
-        canvas.drawRect(rect, paint)
+        paint.color = vehicleColor
+        paint.style = Paint.Style.FILL
+        canvas.drawRect(vehicleRect, paint)
+        paint.color = Color.BLUE
+        paint.style = Paint.Style.FILL
+        canvas.drawRect(frontRect, paint)
         canvas.restore()
     }
 
-    private fun absoluteToRelativePosition(point: Point): Point {
+    private fun absoluteToRelativePosition(point: PointF): Point {
         return Point(
             width / 2 - position.x + point.x,
             height / 2 + position.y - point.y
@@ -119,8 +131,8 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
 
     fun setVehicle(vehicleInfo: String) {
         val data = vehicleInfo.split('|')
-        this.position.x = data[0].toInt()
-        this.position.y = data[1].toInt()
+        this.position.x = data[0].toFloat()
+        this.position.y = data[1].toFloat()
         this.orientation = data[2].toFloat()
         invalidate()
     }
@@ -131,8 +143,8 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
     }
 
     fun reset() {
-        position.x = 0
-        position.y = 0
+        position.x = 0f
+        position.y = 0f
         orientation = 0f
         obstacles.clear()
         invalidate()
@@ -145,7 +157,7 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
 
         for (i in 0..<obstaclesCount) {
             this.obstacles.add(
-                Point(
+                PointF(
                     BigInteger(rowObstacles.slice(i*4..i*4+1).toByteArray()).toInt(),
                     BigInteger(rowObstacles.slice(i*4+2..i*4+3).toByteArray()).toInt()
                 )
@@ -160,4 +172,5 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
     }
 }
 
-class Point(var x: Int, var y: Int)
+class Point(var x: Float, var y: Float)
+class PointF(var x: Int, var y: Int)

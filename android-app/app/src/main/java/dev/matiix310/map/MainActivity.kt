@@ -95,8 +95,16 @@ class MainActivity : ComponentActivity() {
             })
 
         val resetButton = findViewById<Button>(R.id.reset_button)
-
         resetButton.setOnClickListener { mqttClient.publish("Client/Reset", "") }
+
+        val rotateButton = findViewById<Button>(R.id.rotate_button)
+        rotateButton.setOnClickListener { mqttClient.publish("Lego/Status", "T360") }
+
+        val upButton = findViewById<Button>(R.id.up_button)
+        upButton.setOnClickListener { mqttClient.publish("Lego/Status", "B100|90") }
+
+        val downButton = findViewById<Button>(R.id.down_button)
+        downButton.setOnClickListener { mqttClient.publish("Lego/Status", "B-100|90") }
     }
 
     private fun subscribe() {
