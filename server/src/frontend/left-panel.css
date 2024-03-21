@@ -1,0 +1,144 @@
+.left-panel {
+  flex: 2;
+  background-color: var(--light-black);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.left-panel-top {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left-panel-top h1 {
+  color: var(--white);
+  font-size: 1.3rem;
+  padding-left: 15px;
+  font-weight: 500;
+}
+
+.followed-channels-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.followed-channels-label h1 {
+  color: var(--white);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding-left: 15px;
+}
+
+.followed-channels-label svg {
+  padding-right: 15px;
+}
+
+.followed-channels-label:hover {
+  background-color: var(--gray);
+  cursor: pointer;
+}
+
+.live-channels {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.live-channel {
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 5%;
+}
+
+.live-channel > img {
+  /* flex: 1; */
+  max-height: 70%;
+  margin-right: 10px;
+  border-radius: 999px;
+  /* background-color: var(--white); */
+}
+
+.live-channel-meta {
+  flex: 4;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.live-channel-meta :nth-child(1) {
+  color: var(--white);
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.live-channel-meta :nth-child(2) {
+  color: var(--dark-white);
+  font-size: 0.7rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.live-channel-viewers {
+  flex: 1;
+  width: 100%;
+  display: flex;
+}
+
+.live-channel-viewers span {
+  margin: 5px;
+  display: block;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 999px;
+}
+
+.live-channel-viewers h1 {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--dark-white);
+}
+
+.live-channel:hover {
+  cursor: pointer;
+  background-color: var(--gray);
+}
+
+.live-channels-label {
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px 0;
+}
+
+.live-channels-label h1 {
+  color: var(--white);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding-left: 15px;
+}
+
+.live-channels-show-more {
+  width: fit-content;
+  font-size: 0.8rem;
+  margin-top: 10px;
+  margin-left: 15px;
+  color: var(--light-purple);
+}
+
+.live-channels-show-more:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}

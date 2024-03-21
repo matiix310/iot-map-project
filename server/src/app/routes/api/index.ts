@@ -14,7 +14,7 @@ export default function (mapServer: MapServer) {
   router.get("/badapple", async (_, res) => {
     if (mapServer.playBadApple()) {
       await new Promise((r) => setTimeout(r, 1000));
-      res.redirect("/static/badapple.mp4");
+      res.redirect("/public/badapple.mp4");
     } else res.send("Error, can't start Bad Apple!");
   });
 

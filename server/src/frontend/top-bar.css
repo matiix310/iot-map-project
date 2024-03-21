@@ -1,0 +1,134 @@
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3rem;
+  width: 100%;
+  z-index: 100;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.top-bar-left,
+.top-bar-middle,
+.top-bar-right {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.top-bar-left {
+  justify-content: flex-start;
+}
+
+.top-bar-middle {
+  justify-content: center;
+}
+
+.top-bar-right {
+  justify-content: flex-end;
+}
+
+.top-bar-left > img {
+  height: 50%;
+  margin: 20px;
+}
+
+.top-bar h1 {
+  color: var(--white);
+}
+
+.top-bar-left h1 {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 15px;
+}
+
+.top-bar-left h1:hover {
+  color: var(--purple);
+  cursor: pointer;
+}
+
+.top-bar-left svg {
+  fill: var(--white);
+  margin: 20px;
+}
+
+.search-box {
+  height: 70%;
+  width: 70%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-field {
+  border: solid 1px var(--light-gray);
+  height: 100%;
+  width: 100%;
+  border-radius: 5px 0 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.search-field h1 {
+  color: var(--light-gray);
+  font-size: 1rem;
+  margin: 10px;
+  font-weight: 400;
+}
+
+.search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  aspect-ratio: 1;
+  background-color: var(--gray);
+  border-radius: 0 5px 5px 0;
+}
+
+.search-btn svg {
+  fill: var(--white);
+  height: 60%;
+}
+
+.search-btn:hover {
+  cursor: pointer;
+  background-color: var(--hover-gray);
+}
+
+.top-bar-right svg {
+  fill: var(--white);
+}
+
+.top-bar-right .light-button {
+  height: 60%;
+}
+
+.top-bar-right .light-button h1 {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.top-bar-right > img {
+  height: 60%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  /* background-color: var(--white); */
+  margin: 10px;
+}
+
+.top-bar-right > img:hover {
+  cursor: pointer;
+}
+
+.top-bar {
+  box-shadow: 0 2px 5px #000;
+}

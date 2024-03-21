@@ -1,0 +1,216 @@
+.middle-panel {
+  flex: 11;
+  background-color: var(--black);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow-y: auto;
+}
+
+.video-frame {
+  width: 100%;
+  aspect-ratio: 1.78;
+  background-color: #000;
+}
+
+.video-meta-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  height: 100px;
+  width: 96%;
+}
+
+.video-meta {
+  width: 100%;
+  margin-left: 20px;
+}
+
+.video-meta-profile {
+  flex: 1;
+  width: 100%;
+  height: 70%;
+  position: relative;
+  cursor: pointer;
+}
+
+.video-meta-profile img {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.video-meta-profile > span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% + 4px);
+  aspect-ratio: 1;
+  border: solid var(--purple) 3px;
+  border-radius: 999px;
+}
+
+.video-meta-profile:hover > span {
+  border-width: 4px;
+}
+
+.video-meta-profile > h1 {
+  background-color: red;
+  color: var(--white);
+  padding: 2px 5px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: solid 3px var(--black);
+  border-radius: 5px;
+
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  z-index: 5;
+}
+
+.react-button {
+  background-color: transparent;
+  color: var(--light-purple);
+}
+
+.react-button:hover h1 {
+  color: var(--white);
+}
+
+.react-button:hover svg {
+  fill: var(--white);
+}
+
+.react-button svg {
+  fill: var(--purple);
+}
+
+.meta-left,
+.meta-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.first-line,
+.second-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.second-line {
+  margin-top: 5px;
+}
+
+.follow-button,
+.notif-button {
+  background-color: var(--hover-gray);
+}
+
+.follow-button:hover,
+.notif-button:hover {
+  background-color: var(--red);
+}
+
+.react-button h1,
+.subscribe-button h1 {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.react-button,
+.subscribe-button {
+  margin: 0 10px;
+}
+
+.subscribe-button {
+  background-color: var(--purple);
+}
+
+.subscribe-button:hover {
+  background-color: var(--dark-purple);
+}
+
+.first-line .meta-left > h1 {
+  color: var(--white);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.first-line .meta-left > svg {
+  fill: var(--purple);
+  margin: 5px;
+}
+
+.video-meta-profile > h1 {
+  position: absolute;
+}
+
+.second-line .meta-left > h1 {
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.second-line .meta-right > h1 {
+  color: var(--white);
+  font-size: 0.9rem;
+  margin: 5px;
+}
+
+.viewer-count {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 5px;
+}
+
+.viewer-count h1 {
+  color: var(--red);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.viewer-count svg {
+  fill: var(--red);
+}
+
+.third-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.meta-game {
+  color: var(--light-purple);
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.meta-game:hover {
+  text-decoration: underline;
+}
+
+.meta-tag {
+  color: var(--light-light-gray);
+  font-size: 0.8rem;
+  padding: 1px 10px;
+  margin-left: 5px;
+  background-color: var(--gray);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.meta-tag:hover {
+  background-color: var(--hover-gray);
+}
