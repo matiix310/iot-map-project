@@ -8,7 +8,7 @@ let position = { x: 0, y: 0 };
 const canvasElement = document.getElementById("videoCanvas");
 const videoFrame = document.getElementById("videoFrame");
 
-socket.on("obstacles", (buffer) => {
+const onObstacles = (buffer) => {
   const view = new DataView(buffer);
 
   const tmpObstacles = [];
@@ -20,7 +20,7 @@ socket.on("obstacles", (buffer) => {
   obstacles = tmpObstacles;
 
   drawObstacles();
-});
+};
 
 const clearCanvas = () => {
   if (!canvasElement.getContext) return;

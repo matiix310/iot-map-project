@@ -62,9 +62,16 @@ class MapServer {
   }
 
   playBadApple(): boolean {
-    if (!this.map) return false;
     this.map.playBadApple();
     return true;
+  }
+
+  stopBadApple() {
+    this.map.stopBadApple();
+  }
+
+  badAppleStatus() {
+    return this.map.badAppleStatus();
   }
 
   status(): RequestJson<{ position: Location; orientation: number }> {

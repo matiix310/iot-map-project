@@ -20,6 +20,7 @@ class Map {
   // Debug
   private worstTime: number;
   private badapple: boolean;
+  private badappleTime: number;
 
   // Constants
   private vehicleWidth = 100;
@@ -38,6 +39,7 @@ class Map {
     this.worstTime = 0;
     this.mqttServer = mqttServer;
     this.badapple = false;
+    this.badappleTime = 0;
   }
 
   connectToMqtt() {
@@ -147,6 +149,7 @@ class Map {
     const framesName = fs.readdirSync(framesPath);
     const framesCount = framesName.length;
 
+    this.badappleTime = 0;
     this.badapple = true;
     const offset = {
       x: (320 * this.obstacleWidth) / 2,
@@ -155,7 +158,10 @@ class Map {
 
     this.socketManager?.sendAction("playBadapple");
 
-    for (let frameName of framesName) {
+    let frameIndex = 0;
+    while (this.badapple && frameIndex < framesCount) {
+      this.badappleTime = frameIndex / 30;
+      const frameName = framesName[frameIndex];
       const badAppleObstacles = [];
       const start = Date.now();
       let i = 0;
@@ -176,8 +182,10 @@ class Map {
       // this.mqttServer.publish("Map/Obstacles", buffer);
       this.socketManager?.sendObstacles(buffer);
       await new Promise((r) => setTimeout(r, 1000 / 30 - (Date.now() - start)));
+      frameIndex++;
     }
 
+    this.socketManager?.sendAction("stopBadapple");
     this.badapple = false;
   }
 
@@ -196,6 +204,14 @@ class Map {
       buffer.writeInt16BE(obstacle.y as Int16, i * 4 + 2);
     }
     return buffer;
+  }
+
+  stopBadApple() {
+    this.badapple = false;
+  }
+
+  badAppleStatus(): number | null {
+    return this.badapple ? this.badappleTime : null;
   }
 }
 

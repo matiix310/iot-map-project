@@ -1,14 +1,37 @@
+let audio = new Audio();
+
 // const host = "ws://" + window.location.host.split(":")[0] + ":3000";
-const socket = io();
+var socket = null;
 
-socket.on("action", (action) => {
-  switch (action) {
-    case "playBadapple":
-      var audio = new Audio("/public/badapple.aac");
-      audio.play();
-      break;
+const connectSocket = () => {
+  socket = io();
 
-    default:
-      break;
-  }
-});
+  socket.on("displaymessage", (author, color, message) => {
+    displayMessage(author, message, color);
+  });
+
+  socket.on("action", (action) => {
+    switch (action) {
+      case "playBadapple":
+        audio = new Audio("/public/badapple.aac");
+        audio.play();
+        break;
+
+      case "stopBadapple":
+        audio.pause();
+        audio = new Audio();
+        break;
+
+      default:
+        break;
+    }
+  });
+
+  socket.on("setBadAppleTime", (time) => {
+    audio = new Audio("/public/badapple.aac");
+    audio.play();
+    audio.currentTime = time;
+  });
+
+  socket.on("obstacles", onObstacles);
+};

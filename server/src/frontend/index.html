@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="left-panel.css" />
     <link rel="stylesheet" href="middle-panel.css" />
     <link rel="stylesheet" href="right-panel.css" />
+    <link rel="stylesheet" href="others.css" />
   </head>
   <body>
     <div class="top-bar">
@@ -375,6 +376,46 @@
           </div>
         </div>
       </div>
+    </div>
+    <div id="popup" class="active">
+      <form id="loginForm">
+        <div id="loginPopup">
+          <div class="first-row">
+            <img src="assets/logo.png" />
+            <h1>Log in to Twotch</h1>
+          </div>
+          <div class="row">
+            <h1>Username</h1>
+            <input type="text" name="username" autocomplete="off" id="usernameInput" />
+          </div>
+          <div class="row third-row">
+            <h1>Color</h1>
+            <div class="color-container" id="colorContainer">
+              <span class="selected" style="background-color: red"></span>
+              <span style="background-color: green"></span>
+              <span style="background-color: blue"></span>
+              <span style="background-color: yellow"></span>
+              <span style="background-color: orange"></span>
+              <span style="background-color: purple"></span>
+              <span style="background-color: cornflowerblue"></span>
+              <span style="background-color: pink"></span>
+            </div>
+            <h1>Trouble finding a color?</h1>
+          </div>
+          <input id="loginButton" class="login-button" type="submit" value="Log in" />
+          <svg
+            class="close-button hover-button"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            focusable="false"
+          >
+            <path
+              d="M8.5 10 4 5.5 5.5 4 10 8.5 14.5 4 16 5.5 11.5 10l4.5 4.5-1.5 1.5-4.5-4.5L5.5 16 4 14.5 8.5 10z"
+            ></path>
+          </svg>
+        </div>
+      </form>
     </div>
     <script src="public/socket.io.min.js"></script>
     <script src="socket.js"></script>

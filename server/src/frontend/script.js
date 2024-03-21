@@ -4,6 +4,7 @@ const channelImage = "assets/zerator.png";
 const channelColor = "red";
 const liveGame = "Rocket League";
 const tags = ["Fun", "MQTT", "Lego", "IOT", "Tobias Mühlbauer"];
+const dev = false;
 
 var clientName = "matiix310";
 var clientColor = "red";
@@ -59,7 +60,7 @@ const displayMessage = (author, message, color = "red") => {
   <div class="chat-message">
     <span style="color: ${color}" class="chat-pseudo">${author}</span>
     <span class="chat-content"
-      >: ${message}
+      >: ${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
     </span>
   </div>`;
 
@@ -86,16 +87,57 @@ setInterval(() => {
   timeElement.innerHTML = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }, 1000);
 
-document.getElementById("sendMessageForm").addEventListener("submit", (e) => {
+if (!dev) {
+  document.getElementById("sendMessageForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = e.target[0].value.trim();
+    e.target[0].value = "";
+
+    if (text == "") return;
+
+    if (socket) socket.emit("chatmessage", clientName, clientColor, text);
+  });
+}
+
+const popup = document.getElementById("popup");
+const loginForm = document.getElementById("loginForm");
+const colorContainer = document.getElementById("colorContainer");
+
+colorContainer.addEventListener("click", (e) => {
+  if (e.target.tagName != "SPAN") return;
+
+  for (let i = 0; i < colorContainer.childElementCount; i++)
+    colorContainer.children.item(i).classList.remove("selected");
+
+  e.target.classList.add("selected");
+});
+
+loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const text = e.target[0].value;
-  e.target[0].value = "";
+  const username = e.target[0].value;
 
-  socket.emit("chatmessage", clientName, clientColor, text);
+  if (username.length == 0 || username.length > 20) return;
+
+  let color = "white";
+
+  for (let i = 0; i < colorContainer.childElementCount; i++) {
+    const colorSpan = colorContainer.children.item(i);
+    if (colorSpan.classList.contains("selected"))
+      color = colorSpan.style["background-color"];
+  }
+
+  clientName = username;
+  clientColor = color;
+  popup.classList.remove("active");
+  connectSocket();
 });
 
-socket.on("displaymessage", (author, color, message) => {
-  displayMessage(author, message, color);
+const loginButton = document.getElementById("loginButton");
+const usernameInput = document.getElementById("usernameInput");
+
+usernameInput.addEventListener("input", (e) => {
+  if (e.data == null) loginButton.classList.remove("active");
+  else if (!loginButton.classList.contains("active")) loginButton.classList.add("active");
 });
 
-console.info("clientName  = " + clientName + "\nclientColor = " + clientColor);
+usernameInput.focus();

@@ -31,17 +31,41 @@ export default class SocketManager {
     this.io.on("connection", (socket) => {
       console.log("New client!");
 
-      const sendMessage = (author: String, color: String, message: String) => {
-        socket.emit("displaymessage", author, color, message);
-        socket.broadcast.emit("displaymessage", author, color, message);
+      const sendMessage = (message: String) => {
+        this.io.emit("displaymessage", "Server", "grey", message);
       };
 
+      // check for badapple
+      // ...
+      // Allways check for badapple
+      // ...
+      const badAppleStatus = this.mapServer.badAppleStatus();
+      if (badAppleStatus) {
+        socket.emit("setBadAppleTime", badAppleStatus);
+      }
+
       socket.on("chatmessage", (author, color, message) => {
-        sendMessage(author, color, message);
+        if (message == "") return;
+
+        this.io.emit("displaymessage", author, color, message);
 
         if (message == "!badapple") {
           this.mapServer.playBadApple();
-          sendMessage("Server", "grey", "Playing badapple!");
+          sendMessage("Playing badapple!");
+        } else if (message == "!status") {
+          const status = this.mapServer.status();
+          if (status.error) sendMessage("error! Can't read the status");
+          else
+            sendMessage(
+              `Position> x: ${status.data.position.x}, y: ${status.data.position.y} | Orientation> ${status.data.orientation}°`
+            );
+        } else if (message == "!stop") {
+          if (this.mapServer.badAppleStatus()) {
+            this.mapServer.stopBadApple();
+            sendMessage("Badapple has been stopped!");
+          } else {
+            sendMessage("Badapple is not currently playing... sad :'{");
+          }
         }
       });
     });
@@ -71,6 +95,7 @@ interface ServerToClientEvents {
   displaymessage: (author: String, color: String, message: String) => void;
   obstacles: (buffer: Buffer) => void;
   action: (action: String) => void;
+  setBadAppleTime: (time: number) => void;
 }
 
 interface ClientToServerEvents {
