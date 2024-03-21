@@ -27,14 +27,9 @@
   },
   "dependencies": {
     "aedes": "^0.51.0",
-    "eiows": "^6.7.7",
     "express": "^4.19.1",
     "jimp": "^0.22.12",
     "socket.io": "^4.7.5",
     "websocket-stream": "^5.5.2"
-  },
-  "optionalDependencies": {
-    "bufferutil": "^4.0.8",
-    "utf-8-validate": "^5.0.2"
   }
 }

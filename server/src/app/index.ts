@@ -1,6 +1,6 @@
 import express, { Express } from "express";
+import http from "http";
 import MapServer from "../mqtt";
-import eiwos from "eiows";
 import { Server as socketServer } from "socket.io";
 
 // api route
@@ -9,6 +9,7 @@ import path from "path";
 
 export default class App {
   port: number;
+  private server;
   private app: Express;
   private mapServer: MapServer;
   private io: socketServer<
@@ -28,6 +29,7 @@ export default class App {
       InterServerEvents,
       SocketData
     >();
+    this.server = http.createServer(this.app);
   }
 
   start() {
@@ -35,25 +37,22 @@ export default class App {
     this.io.on("connection", (socket) => {
       console.log("New client!");
 
-      socket.on("chatmessage", (author, color, message) => {
+      const sendMessage = (author: String, color: String, message: String) => {
         socket.emit("displaymessage", author, color, message);
         socket.broadcast.emit("displaymessage", author, color, message);
+      };
+
+      socket.on("chatmessage", (author, color, message) => {
+        sendMessage(author, color, message);
 
         if (message == "!badapple") {
           this.mapServer.playBadApple();
-          socket.emit("displaymessage", "Server", "grey", "Playing badapple!");
-          socket.broadcast.emit("displaymessage", "Server", "grey", "Playing badapple!");
+          sendMessage("Server", "grey", "Playing badapple!");
         }
       });
     });
 
-    this.io.listen(4000, {
-      wsEngine: eiwos.Server,
-      cors: {
-        origin: "http://localhost:" + this.port,
-      },
-    });
-    console.log("Socket.io websocket server listening on port", 4000);
+    this.io.listen(this.server);
 
     this.app.use("/api", getApiRouter(this.mapServer));
 
@@ -64,7 +63,7 @@ export default class App {
     // twotch
     this.app.use(express.static(path.resolve("./") + "/src/frontend"));
 
-    this.app.listen(this.port, () => {
+    this.server.listen(this.port, () => {
       console.log("Express server listening on port", this.port);
     });
   }
