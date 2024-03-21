@@ -174,7 +174,9 @@
         <h1 class="live-channels-show-more">Show More</h1>
       </div>
       <div class="middle-panel">
-        <div class="video-frame"></div>
+        <div id="videoFrame" class="video-frame">
+          <canvas id="videoCanvas"></canvas>
+        </div>
         <div class="video-meta-container">
           <div class="video-meta-profile">
             <img id="channelImage" src="assets/sanjay.png" />
@@ -376,6 +378,7 @@
     </div>
     <script src="public/socket.io.min.js"></script>
     <script src="socket.js"></script>
+    <script src="map.js"></script>
     <script src="data.js"></script>
     <script src="script.js"></script>
   </body>

@@ -1,5 +1,6 @@
 import MqttServer from "./mqttServer";
 import Map, { Location } from "./map";
+import SocketManager from "../app/socketManager";
 
 const blacklistTopic = ["Map/Obstacles", "Map/Robot"];
 
@@ -7,22 +8,19 @@ class MapServer {
   mqttPort: number;
   wsPort: number;
 
-  private mqttServer: MqttServer | null;
-  private map: Map | null;
+  private mqttServer: MqttServer;
+  private map: Map;
 
   constructor(mqttPort: number, wsPort: number) {
     this.mqttPort = mqttPort;
     this.wsPort = wsPort;
-    this.mqttServer = null;
-    this.map = null;
+    // MQTT Server
+    this.mqttServer = new MqttServer(this.mqttPort, this.wsPort);
+    // Map
+    this.map = new Map(this.mqttServer);
   }
 
   start() {
-    // MQTT Server
-    this.mqttServer = new MqttServer(this.mqttPort, this.wsPort);
-
-    // Map
-    this.map = new Map(this.mqttServer);
     this.map.connectToMqtt();
 
     this.mqttServer.aedesClient.on("client", (client) => {
@@ -56,6 +54,11 @@ class MapServer {
       .catch(() =>
         console.error("Map server listneners can't start! Please restart the server.")
       );
+  }
+
+  bindWebsocket(socketManager: SocketManager) {
+    this.map.bindWebsocket(socketManager);
+    this.mqttServer.bindWebsocket(socketManager);
   }
 
   playBadApple(): boolean {

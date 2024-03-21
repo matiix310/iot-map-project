@@ -214,3 +214,9 @@
 .meta-tag:hover {
   background-color: var(--hover-gray);
 }
+
+/* CANVAS */
+
+#videoCanvas {
+  background-color: #fff;
+}

@@ -1,3 +1,4 @@
+import SocketManager from "../../app/socketManager";
 import MqttServer from "../mqttServer";
 import fs from "fs";
 import Jimp from "jimp";
@@ -28,9 +29,10 @@ class Map {
 
   // MQTT Server
   private mqttServer: MqttServer;
+  private socketManager: SocketManager | null = null;
 
   constructor(mqttServer: MqttServer) {
-    this.obstacles = [];
+    this.obstacles = [{ x: 0, y: 10 }];
     this.orientation = 0;
     this.position = { x: 0, y: 0 };
     this.worstTime = 0;
@@ -129,6 +131,10 @@ class Map {
     }, 500);
   }
 
+  bindWebsocket(socketManager: SocketManager) {
+    this.socketManager = socketManager;
+  }
+
   private distance(p1: Location, p2: Location): number {
     const dx = Math.abs(p1.x - p2.x);
     const dy = Math.abs(p1.y - p2.y);
@@ -143,15 +149,17 @@ class Map {
 
     this.badapple = true;
     const offset = {
-      x: 1100,
-      y: 840,
+      x: (320 * this.obstacleWidth) / 2,
+      y: (240 * this.obstacleWidth) / 2,
     };
+
+    this.socketManager?.sendAction("playBadapple");
 
     for (let frameName of framesName) {
       const badAppleObstacles = [];
       const start = Date.now();
       let i = 0;
-      console.log(frameName + " / " + framesCount);
+      // console.log(frameName + " / " + framesCount);
       const frame = fs.readFileSync(framesPath + frameName);
       const image = await Jimp.read(frame);
       for (let x = 0; x < image.getWidth(); x++)
@@ -165,18 +173,19 @@ class Map {
           i++;
         }
       const buffer = this.getBufferFromObstacles(badAppleObstacles);
-      this.mqttServer.publish("Map/Obstacles", buffer);
-      await new Promise((r) => setTimeout(r, 500 - (Date.now() - start)));
+      // this.mqttServer.publish("Map/Obstacles", buffer);
+      this.socketManager?.sendObstacles(buffer);
+      await new Promise((r) => setTimeout(r, 1000 / 30 - (Date.now() - start)));
     }
 
     this.badapple = false;
   }
 
   private isBlackPixel(color: number) {
-    return (color / 255) % 255 <= 246;
+    return color < 1000000000;
   }
 
-  private getBufferFromObstacles(obstacles: Location[]) {
+  private getBufferFromObstacles(obstacles: Location[]): Buffer {
     type Int16 = number & { __brand: "int16" };
 
     const buffer = Buffer.alloc(4 * obstacles.length);

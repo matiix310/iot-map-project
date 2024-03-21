@@ -2,6 +2,7 @@ import aedes from "aedes";
 import net from "net";
 import http from "http";
 import ws from "websocket-stream";
+import SocketManager from "../../app/socketManager";
 
 export default class MqttServer {
   private mqttServer: net.Server;
@@ -11,6 +12,7 @@ export default class MqttServer {
   >;
   private mqttPort: number;
   private wsPort: number;
+  private socketManager: SocketManager | null = null;
 
   public aedesClient: aedes;
 
@@ -76,6 +78,17 @@ export default class MqttServer {
       },
       callback
     );
+
+    if (this.socketManager) {
+      switch (topic) {
+        case "Map/Obstacles":
+          if (payload instanceof Buffer) this.socketManager.sendObstacles(payload);
+          break;
+
+        default:
+          break;
+      }
+    }
   }
 
   subscribe(topic: string) {
@@ -86,5 +99,9 @@ export default class MqttServer {
       },
       () => {}
     );
+  }
+
+  bindWebsocket(socketManager: SocketManager) {
+    this.socketManager = socketManager;
   }
 }
