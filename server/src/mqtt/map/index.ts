@@ -33,8 +33,8 @@ class Map {
   private socketManager: SocketManager | null = null;
 
   constructor(mqttServer: MqttServer) {
-    this.obstacles = [{ x: 0, y: 10 }];
-    this.orientation = 0;
+    this.obstacles = [{ x: 0, y: 0 }];
+    this.orientation = 50;
     this.position = { x: 0, y: 0 };
     this.worstTime = 0;
     this.mqttServer = mqttServer;
@@ -148,6 +148,7 @@ class Map {
     const framesPath = path.resolve("./") + "/src/mqtt/assets/badapple/";
     const framesName = fs.readdirSync(framesPath);
     const framesCount = framesName.length;
+    const fps = 30;
 
     this.badappleTime = 0;
     this.badapple = true;
@@ -160,7 +161,7 @@ class Map {
 
     let frameIndex = 0;
     while (this.badapple && frameIndex < framesCount) {
-      this.badappleTime = frameIndex / 30;
+      this.badappleTime = frameIndex / fps;
       const frameName = framesName[frameIndex];
       const badAppleObstacles = [];
       const start = Date.now();
@@ -181,7 +182,12 @@ class Map {
       const buffer = this.getBufferFromObstacles(badAppleObstacles);
       // this.mqttServer.publish("Map/Obstacles", buffer);
       this.socketManager?.sendObstacles(buffer);
-      await new Promise((r) => setTimeout(r, 1000 / 30 - (Date.now() - start)));
+      const timeout = 1000 / fps;
+      await new Promise((r) => {
+        const processTime = Date.now() - start;
+        if (processTime >= timeout) console.log(`Slow frame render (${frameName})!`);
+        return setTimeout(r, timeout - processTime);
+      });
       frameIndex++;
     }
 

@@ -1,12 +1,21 @@
 // Constants
 const obstacleWidth = 7;
-const zoomLevel = 0.44;
+let zoomLevel = 0.44; // 0.44
+const zoomSensitivity = 1;
 
 let obstacles = [];
 let position = { x: 0, y: 0 };
+let orientation = 0;
 
 const canvasElement = document.getElementById("videoCanvas");
 const videoFrame = document.getElementById("videoFrame");
+
+const onStatus = (status) => {
+  const statusArray = status.split("|");
+  position.x = statusArray[0];
+  position.y = statusArray[1];
+  orientation = statusArray[2];
+};
 
 const onObstacles = (buffer) => {
   const view = new DataView(buffer);
@@ -18,8 +27,6 @@ const onObstacles = (buffer) => {
   }
 
   obstacles = tmpObstacles;
-
-  drawObstacles();
 };
 
 const clearCanvas = () => {
@@ -68,9 +75,11 @@ const placeCanvas = () => {
 
   const ctx = canvasElement.getContext("2d");
 
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
   ctx.translate(
-    canvasElement.width / 2 - position.x,
-    canvasElement.height / 2 + position.y
+    canvasElement.width / 2 - position.x * zoomLevel,
+    canvasElement.height / 2 + position.y * zoomLevel
   );
 };
 
@@ -81,4 +90,27 @@ const updateCanvas = () => {
 };
 
 window.onresize = updateCanvas;
-updateCanvas();
+
+const updateOnFrame = () => {
+  updateCanvas();
+  requestAnimationFrame(updateOnFrame);
+};
+
+updateOnFrame();
+
+videoFrame.addEventListener("click", (e) => {
+  const clickPosition = {
+    x: e.layerX,
+    y: e.layerY,
+  };
+
+  console.log(clickPosition.x, clickPosition.y);
+});
+
+videoFrame.addEventListener("wheel", (e) => {
+  let delta = (e.wheelDeltaY * zoomSensitivity) / 1000 + 1;
+  if (delta < 0) delta = 0;
+  else if (delta > 2) delta = 2;
+
+  zoomLevel *= delta;
+});

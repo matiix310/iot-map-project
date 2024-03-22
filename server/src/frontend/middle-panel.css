@@ -219,4 +219,5 @@
 
 #videoCanvas {
   background-color: #fff;
+  cursor: crosshair;
 }

@@ -81,6 +81,10 @@ export default class SocketManager {
     this.io.emit("obstacles", buffer);
   }
 
+  sendStatus(status: String) {
+    this.io.emit("status", status);
+  }
+
   sendAction(action: String) {
     this.io.emit("action", action);
   }
@@ -96,6 +100,7 @@ interface ServerToClientEvents {
   obstacles: (buffer: Buffer) => void;
   action: (action: String) => void;
   setBadAppleTime: (time: number) => void;
+  status: (status: String) => void;
 }
 
 interface ClientToServerEvents {

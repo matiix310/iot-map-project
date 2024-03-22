@@ -34,4 +34,6 @@ const connectSocket = () => {
   });
 
   socket.on("obstacles", onObstacles);
+
+  socket.on("status", onStatus);
 };

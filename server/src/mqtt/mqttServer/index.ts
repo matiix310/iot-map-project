@@ -85,6 +85,10 @@ export default class MqttServer {
           if (payload instanceof Buffer) this.socketManager.sendObstacles(payload);
           break;
 
+        case "Map/Robot":
+          if (typeof payload == "string") this.socketManager.sendStatus(payload);
+          break;
+
         default:
           break;
       }
