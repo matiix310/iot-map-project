@@ -89,6 +89,14 @@ class MapServer {
     };
   }
 
+  publish(
+    topic: string,
+    payload: string | Buffer,
+    callback?: (error?: Error | undefined) => void
+  ): void {
+    this.mqttServer.publish(topic, payload, callback);
+  }
+
   obstacles(): RequestJson<Location[]> {
     if (!this.map)
       return {

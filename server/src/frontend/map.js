@@ -89,7 +89,7 @@ const updateCanvas = () => {
   drawObstacles();
 };
 
-window.onresize = updateCanvas;
+// window.onresize = updateCanvas;
 
 const updateOnFrame = () => {
   updateCanvas();
@@ -99,12 +99,25 @@ const updateOnFrame = () => {
 updateOnFrame();
 
 videoFrame.addEventListener("click", (e) => {
-  const clickPosition = {
-    x: e.layerX,
-    y: e.layerY,
-  };
+  const clickX = e.layerX;
+  const clickY = e.layerY;
+  const centerX = e.target.width / 2;
+  const centerY = e.target.height / 2;
+  const deltaX = Math.abs(centerX - clickX);
+  const deltaY = Math.abs(centerY - clickY);
 
-  console.log(clickPosition.x, clickPosition.y);
+  const dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / zoomLevel;
+
+  let angle = (Math.atan(deltaY / deltaX) * 180) / Math.PI;
+
+  if (clickY < centerY) angle = 90 - angle;
+  else angle = 90 + angle;
+  if (clickX < centerX) angle = -angle;
+
+  if (socket) {
+    socket.emit("legoTurn", angle);
+    socket.emit("legoStraight", Math.round(dist));
+  }
 });
 
 videoFrame.addEventListener("wheel", (e) => {

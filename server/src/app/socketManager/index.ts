@@ -68,6 +68,14 @@ export default class SocketManager {
           }
         }
       });
+
+      socket.on("legoTurn", (angle) => {
+        this.mapServer.publish("Lego/Status", "T" + angle);
+      });
+
+      socket.on("legoStraight", (distance) => {
+        this.mapServer.publish("Lego/Status", "S" + distance);
+      });
     });
 
     this.io.listen(this.server);
@@ -105,7 +113,9 @@ interface ServerToClientEvents {
 
 interface ClientToServerEvents {
   chatmessage: (author: String, color: String, message: String) => void;
-  badapple: () => void;
+  // badapple: () => void;
+  legoTurn: (angle: number) => void;
+  legoStraight: (distance: number) => void;
 }
 
 interface InterServerEvents {
