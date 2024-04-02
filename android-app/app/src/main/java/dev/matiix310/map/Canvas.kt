@@ -102,7 +102,7 @@ class Canvas(context: Context, attrSet: android.util.AttributeSet): View(context
         // Draw the vehicle
 
         val x = (width - vehicleWidth) / 2
-        val y = (height - vehicleHeight) / 2
+        val y = (height) / 2
         val vehicleRect = Rect(x, y, x + vehicleWidth, y + vehicleHeight)
 
         // Draw the front of the vehicle
