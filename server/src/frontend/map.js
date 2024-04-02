@@ -1,11 +1,14 @@
 // Constants
 const obstacleWidth = 7;
+const vehicleWidth = 100;
+const vehicleHeight = 150;
+const frontHeight = 100;
 let zoomLevel = 0.44; // 0.44
 const zoomSensitivity = 1;
 
 let obstacles = [];
 let position = { x: 0, y: 0 };
-let orientation = 0;
+let vehicleOrientation = 0;
 
 const canvasElement = document.getElementById("videoCanvas");
 const videoFrame = document.getElementById("videoFrame");
@@ -14,7 +17,7 @@ const onStatus = (status) => {
   const statusArray = status.split("|");
   position.x = statusArray[0];
   position.y = statusArray[1];
-  orientation = statusArray[2];
+  vehicleOrientation = statusArray[2].toString();
 };
 
 const onObstacles = (buffer) => {
@@ -51,8 +54,6 @@ const drawObstacles = () => {
   const realObstacleWidth = obstacleWidth * zoomLevel + 1;
   const ctx = canvasElement.getContext("2d");
 
-  clearCanvas();
-
   for (let { x, y } of obstacles) {
     ctx.fillRect(
       x * zoomLevel - obstacleOffset,
@@ -83,10 +84,39 @@ const placeCanvas = () => {
   );
 };
 
+const drawVehicle = () => {
+  if (!canvasElement.getContext) return;
+
+  const ctx = canvasElement.getContext("2d");
+
+  ctx.save();
+  ctx.translate(position.x * zoomLevel, -position.y * zoomLevel);
+  ctx.rotate((Math.PI / 180) * vehicleOrientation);
+  ctx.translate(-position.x * zoomLevel, position.y * zoomLevel);
+  ctx.fillStyle = socket && socket.connected ? "lime" : "red";
+  ctx.fillRect(
+    (position.x - vehicleWidth / 2) * zoomLevel,
+    -position.y * zoomLevel,
+    vehicleWidth * zoomLevel,
+    vehicleHeight * zoomLevel
+  );
+  ctx.fillStyle = "blue";
+  ctx.fillRect(
+    (position.x - vehicleWidth / 2) * zoomLevel,
+    (-position.y - frontHeight) * zoomLevel,
+    vehicleWidth * zoomLevel,
+    frontHeight * zoomLevel
+  );
+  ctx.fillStyle = "black";
+  ctx.restore();
+};
+
 const updateCanvas = () => {
+  clearCanvas();
   resizeCanvas();
   placeCanvas();
   drawObstacles();
+  drawVehicle();
 };
 
 // window.onresize = updateCanvas;
@@ -108,14 +138,16 @@ videoFrame.addEventListener("click", (e) => {
 
   const dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / zoomLevel;
 
-  let angle = (Math.atan(deltaY / deltaX) * 180) / Math.PI;
+  let angle =
+    (180 / Math.PI) * Math.atan2(clickX - centerX, clickY - centerY) +
+    180 +
+    parseInt(vehicleOrientation);
 
-  if (clickY < centerY) angle = 90 - angle;
-  else angle = 90 + angle;
-  if (clickX < centerX) angle = -angle;
+  if (angle > 360) angle -= 360;
+  else if (angle < 0) angle += 360;
 
   if (socket) {
-    socket.emit("legoTurn", angle);
+    socket.emit("legoTurn", Math.round(angle));
     socket.emit("legoStraight", Math.round(dist));
   }
 });

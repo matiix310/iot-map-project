@@ -34,8 +34,8 @@ class Map {
 
   constructor(mqttServer: MqttServer) {
     this.obstacles = [{ x: 0, y: 0 }];
-    this.orientation = 0;
-    this.position = { x: 0, y: 0 };
+    this.orientation = 20;
+    this.position = { x: 0, y: -200 };
     this.worstTime = 0;
     this.mqttServer = mqttServer;
     this.badapple = false;
