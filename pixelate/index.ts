@@ -78,7 +78,7 @@ const pixelatev2 = async () => {
 
   const headerSize = 9 + width.toString().length + height.toString().length;
 
-  let frame = new Uint16Array(pixelCount);
+  let frame = new Uint16Array(pixelCount * 2);
   let pixelIndexInFrame = 0;
   let frameIndex = 0;
   let pixelIndex = 0;
