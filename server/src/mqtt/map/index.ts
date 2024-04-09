@@ -148,9 +148,9 @@ class Map {
     const framesPath = path.resolve("./") + "/src/mqtt/assets/badapple/";
     const framesName = fs.readdirSync(framesPath);
     const framesCount = framesName.length;
-    const fps = 30;
-    const width = 480;
-    const height = 360;
+    const fps = 10;
+    const width = 240;
+    const height = 180;
 
     this.badappleTime = 0;
     this.badapple = true;
