@@ -43,7 +43,7 @@ const clearCanvas = () => {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-  // Restore the transform
+  // Restore the transf
   ctx.restore();
 };
 
@@ -53,6 +53,8 @@ const drawObstacles = () => {
   const obstacleOffset = (obstacleWidth * zoomLevel) / 2;
   const realObstacleWidth = obstacleWidth * zoomLevel + 1;
   const ctx = canvasElement.getContext("2d");
+
+  // console.log(obstacles);
 
   for (let { x, y } of obstacles) {
     ctx.fillRect(
@@ -145,6 +147,8 @@ videoFrame.addEventListener("click", (e) => {
 
   if (angle > 360) angle -= 360;
   else if (angle < 0) angle += 360;
+
+  angle = 360 - angle;
 
   if (socket) {
     socket.emit("legoTurn", Math.round(angle));

@@ -149,13 +149,18 @@ class Map {
     const framesName = fs.readdirSync(framesPath);
     const framesCount = framesName.length;
     const fps = 30;
+    const width = 480;
+    const height = 360;
 
     this.badappleTime = 0;
     this.badapple = true;
-    const offset = {
-      x: (320 * this.obstacleWidth) / 2,
-      y: (240 * this.obstacleWidth) / 2,
-    };
+
+    this.mqttServer.publish(
+      "Map/Robot",
+      `${Math.round(width / 2) * this.obstacleWidth}|${
+        Math.round(height / 2) * this.obstacleWidth
+      }|0`
+    );
 
     this.socketManager?.sendAction("playBadapple");
 
@@ -163,24 +168,10 @@ class Map {
     while (this.badapple && frameIndex < framesCount) {
       this.badappleTime = frameIndex / fps;
       const frameName = framesName[frameIndex];
-      const badAppleObstacles = [];
       const start = Date.now();
-      let i = 0;
-      // console.log(frameName + " / " + framesCount);
-      const frame = fs.readFileSync(framesPath + frameName);
-      const image = await Jimp.read(frame);
-      for (let x = 0; x < image.getWidth(); x++)
-        for (let y = 0; y < image.getHeight(); y++) {
-          if (this.isBlackPixel(image.getPixelColor(x, y))) {
-            badAppleObstacles.push({
-              x: x * this.obstacleWidth - offset.x,
-              y: -(y * this.obstacleWidth - offset.y),
-            });
-          }
-          i++;
-        }
-      const buffer = this.getBufferFromObstacles(badAppleObstacles);
-      // this.mqttServer.publish("Map/Obstacles", buffer);
+
+      const buffer = fs.readFileSync(framesPath + frameName);
+
       this.socketManager?.sendObstacles(buffer);
       const timeout = 1000 / fps;
       await new Promise((r) => {
@@ -193,10 +184,6 @@ class Map {
 
     this.socketManager?.sendAction("stopBadapple");
     this.badapple = false;
-  }
-
-  private isBlackPixel(color: number) {
-    return color < 1000000000;
   }
 
   private getBufferFromObstacles(obstacles: Location[]): Buffer {
