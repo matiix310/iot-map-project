@@ -147,6 +147,7 @@ class Map {
   async playBadApple() {
     const framesPath = path.resolve("./") + "/src/mqtt/assets/badapple/";
     const framesName = fs.readdirSync(framesPath);
+    framesName.sort();
     const framesCount = framesName.length;
     const fps = 10;
     const width = 240;
