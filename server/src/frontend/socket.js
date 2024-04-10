@@ -1,10 +1,10 @@
 let audio = new Audio();
 
-// const host = "ws://" + window.location.host.split(":")[0] + ":3000";
+const host = "ws://" + window.location.host.split(":")[0] + ":4000";
 var socket = null;
 
 const connectSocket = () => {
-  socket = io();
+  socket = io(host);
 
   socket.on("displaymessage", (author, color, message) => {
     displayMessage(author, message, color);

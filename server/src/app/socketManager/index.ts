@@ -1,6 +1,6 @@
 import { Server as socketServer } from "socket.io";
 import MapServer from "../../mqtt";
-import http from "http";
+import { App as uwsApp } from "uWebSockets.js";
 
 export default class SocketManager {
   private io: socketServer<
@@ -10,20 +10,20 @@ export default class SocketManager {
     SocketData
   >;
   private mapServer: MapServer;
-  private server;
+  private server = uwsApp();
 
-  constructor(
-    mapServer: MapServer,
-    server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
-  ) {
+  constructor(mapServer: MapServer) {
     this.io = new socketServer<
       ClientToServerEvents,
       ServerToClientEvents,
       InterServerEvents,
       SocketData
-    >();
+    >({
+      cors: {
+        origin: "*",
+      },
+    });
     this.mapServer = mapServer;
-    this.server = server;
   }
 
   start() {
@@ -78,7 +78,13 @@ export default class SocketManager {
       });
     });
 
-    this.io.listen(this.server);
+    this.io.attachApp(this.server);
+    this.server.listen(4000, (token) => {
+      if (!token) {
+        console.warn("port already in use");
+      }
+      console.log("uWS server listening on port", 4000);
+    });
   }
 
   sendMessage(message: String) {

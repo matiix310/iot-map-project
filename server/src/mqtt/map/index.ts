@@ -149,7 +149,7 @@ class Map {
     const framesName = fs.readdirSync(framesPath);
     framesName.sort();
     const framesCount = framesName.length;
-    const fps = 10;
+    const fps = 5;
     const width = 240;
     const height = 180;
 

@@ -20,7 +20,7 @@ export default class App {
     this.app = express();
     this.mapServer = mapServer;
     this.server = http.createServer(this.app);
-    this.socketManager = new SocketManager(mapServer, this.server);
+    this.socketManager = new SocketManager(mapServer);
   }
 
   start() {
