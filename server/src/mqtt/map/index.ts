@@ -1,7 +1,6 @@
 import SocketManager from "../../app/socketManager";
 import MqttServer from "../mqttServer";
 import fs from "fs";
-import Jimp from "jimp";
 import path from "path";
 
 type Location = {
@@ -12,6 +11,7 @@ type Location = {
 class Map {
   // Map
   obstacles: Location[];
+  pings: Location[];
 
   // Robot
   orientation: number;
@@ -34,7 +34,8 @@ class Map {
 
   constructor(mqttServer: MqttServer) {
     this.obstacles = [{ x: 0, y: 0 }];
-    this.orientation = 20;
+    this.pings = [];
+    this.orientation = 0;
     this.position = { x: 0, y: -200 };
     this.worstTime = 0;
     this.mqttServer = mqttServer;
@@ -122,6 +123,24 @@ class Map {
         // Obstacles list
         const buffer = this.getBufferFromObstacles(this.obstacles);
         this.mqttServer.publish("Map/Obstacles", buffer);
+
+        // manage pings
+        if (this.pings.length > 0) {
+          const ping = this.pings.splice(0, 1)[0];
+          // compute the angle and the distance
+          const deltaX = ping.x - this.position.x;
+          const deltaY = ping.y - this.position.y;
+          const dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+          let angle = (180 / Math.PI) * Math.atan2(deltaY, deltaX) - 90;
+
+          // home made modulo
+          if (angle >= 360) angle -= 360;
+          else if (angle < 0) angle += 360;
+
+          this.mqttServer.publish("Lego/Status", "T" + Math.round(angle));
+          this.mqttServer.publish("Lego/Status", "S" + Math.round(dist));
+        }
       }
 
       // Debug
@@ -149,7 +168,7 @@ class Map {
     const framesName = fs.readdirSync(framesPath);
     framesName.sort();
     const framesCount = framesName.length;
-    const fps = 5;
+    const fps = 20;
     const width = 240;
     const height = 180;
 

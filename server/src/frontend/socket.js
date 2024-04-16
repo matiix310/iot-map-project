@@ -35,5 +35,8 @@ const connectSocket = () => {
 
   socket.on("obstacles", onObstacles);
 
+  socket.on("addPing", onAddPing);
+  socket.on("removePing", onRemovePing);
+
   socket.on("status", onStatus);
 };

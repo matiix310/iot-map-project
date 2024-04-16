@@ -108,6 +108,11 @@ class MapServer {
       data: this.map.obstacles,
     };
   }
+
+  addPing(x: number, y: number): boolean {
+    this.map.pings.push({ x, y });
+    return true;
+  }
 }
 
 type RequestJson<T> =

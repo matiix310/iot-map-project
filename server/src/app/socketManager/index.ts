@@ -76,6 +76,10 @@ export default class SocketManager {
       socket.on("legoStraight", (distance) => {
         this.mapServer.publish("Lego/Status", "S" + distance);
       });
+
+      socket.on("moveTo", (x, y) => {
+        if (this.mapServer.addPing(x, y)) this.io.emit("addPing", x, y);
+      });
     });
 
     this.io.attachApp(this.server);
@@ -102,6 +106,10 @@ export default class SocketManager {
   sendAction(action: String) {
     this.io.emit("action", action);
   }
+
+  removePing(x: number, y: number) {
+    this.io.emit("removePing", x, y);
+  }
 }
 
 // Socket.io mandatory types
@@ -115,6 +123,8 @@ interface ServerToClientEvents {
   action: (action: String) => void;
   setBadAppleTime: (time: number) => void;
   status: (status: String) => void;
+  addPing: (x: number, y: number) => void;
+  removePing: (x: number, y: number) => void;
 }
 
 interface ClientToServerEvents {
@@ -122,6 +132,7 @@ interface ClientToServerEvents {
   // badapple: () => void;
   legoTurn: (angle: number) => void;
   legoStraight: (distance: number) => void;
+  moveTo: (x: number, y: number) => void;
 }
 
 interface InterServerEvents {
