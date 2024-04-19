@@ -165,7 +165,10 @@ def listen(topic,msg):
             liste = m[1:].split("|")
             Arm.run_angle(int(liste[0]), int(liste[1]))
         elif m[0] == "T":
-            robot.turn(float(m[1:]))
+            angle = float(m[1:])
+            if angle > 180 and angle != 360:
+                angle = angle - 360
+            robot.turn(angle)
             send()
         elif m[0] == "S":
             robot.straight(int(m[1:]))
