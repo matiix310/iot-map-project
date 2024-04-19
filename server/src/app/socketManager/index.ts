@@ -66,6 +66,8 @@ export default class SocketManager {
           } else {
             sendMessage("Badapple is not currently playing... sad :'{");
           }
+        } else if (message == "!reset") {
+          this.mapServer.reset();
         }
       });
 

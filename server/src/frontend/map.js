@@ -44,8 +44,11 @@ const onAddPing = (x, y) => {
 };
 
 const onRemovePing = (x, y) => {
-  const index = pings.indexOf(5);
-  if (index > -1) {
+  let index = 0;
+
+  while (index < pings.length && (pings[index].x != x || pings[index].y != y)) index++;
+
+  if (index != pings.length) {
     pings.splice(index, 1);
   }
 };

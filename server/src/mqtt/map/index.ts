@@ -12,6 +12,7 @@ class Map {
   // Map
   obstacles: Location[];
   pings: Location[];
+  currentPing: Location | null;
 
   // Robot
   orientation: number;
@@ -35,8 +36,9 @@ class Map {
   constructor(mqttServer: MqttServer) {
     this.obstacles = [{ x: 0, y: 0 }];
     this.pings = [];
+    this.currentPing = null;
     this.orientation = 0;
-    this.position = { x: 0, y: -200 };
+    this.position = { x: 0, y: 0 };
     this.worstTime = 0;
     this.mqttServer = mqttServer;
     this.badapple = false;
@@ -87,12 +89,20 @@ class Map {
 
         case "Client/Reset":
           {
-            this.obstacles = [];
-            this.orientation = 0;
-            this.position = { x: 0, y: 0 };
-            this.worstTime = 0;
+            this.reset();
+          }
+          break;
 
-            this.mqttServer.publish("Map/Reset", "");
+        case "Lego/Ping":
+          {
+            if (this.currentPing) {
+              this.socketManager?.removePing(this.currentPing.x, this.currentPing.y);
+              this.currentPing = null;
+            } else {
+              console.error(
+                "Euuuh, y'a clairement un problème! currentPing est null et on me demande de le supprimer. Le robot est complétement désynchronisé!"
+              );
+            }
           }
           break;
 
@@ -104,6 +114,7 @@ class Map {
     this.mqttServer.subscribe("Lego/Distance");
     this.mqttServer.subscribe("Lego/Move");
     this.mqttServer.subscribe("Lego/Turn");
+    this.mqttServer.subscribe("Lego/Ping");
     this.mqttServer.subscribe("Client/Reset");
 
     setInterval(() => {
@@ -125,14 +136,15 @@ class Map {
         this.mqttServer.publish("Map/Obstacles", buffer);
 
         // manage pings
-        if (this.pings.length > 0) {
-          const ping = this.pings.splice(0, 1)[0];
+        if (this.pings.length > 0 && !this.currentPing) {
+          this.currentPing = this.pings.splice(0, 1)[0];
           // compute the angle and the distance
-          const deltaX = ping.x - this.position.x;
-          const deltaY = ping.y - this.position.y;
+          const deltaX = this.currentPing.x - this.position.x;
+          const deltaY = this.currentPing.y - this.position.y;
           const dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-          let angle = (180 / Math.PI) * Math.atan2(deltaY, deltaX) - 90;
+          let angle =
+            360 - ((180 / Math.PI) * Math.atan2(deltaY, deltaX) - 90) - this.orientation;
 
           // home made modulo
           if (angle >= 360) angle -= 360;
@@ -225,6 +237,17 @@ class Map {
 
   badAppleStatus(): number | null {
     return this.badapple ? this.badappleTime : null;
+  }
+
+  reset() {
+    this.obstacles = [];
+    this.pings = [];
+    this.currentPing = null;
+    this.orientation = 0;
+    this.position = { x: 0, y: 0 };
+    this.worstTime = 0;
+
+    this.mqttServer.publish("Map/Reset", "");
   }
 }
 

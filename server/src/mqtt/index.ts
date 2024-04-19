@@ -113,6 +113,10 @@ class MapServer {
     this.map.pings.push({ x, y });
     return true;
   }
+
+  reset() {
+    this.map.reset();
+  }
 }
 
 type RequestJson<T> =
