@@ -1,9 +1,9 @@
-const channelName = "IOT";
-const liveTitle = "Coucou on fait le l'IOT | !badapple, !status";
+const channelName = "IoT";
+const liveTitle = "Hello IoT 👋 Bip Bip | !badapple, !status";
 const channelImage = "assets/zerator.png";
 const channelColor = "red";
 const liveGame = "Rocket League";
-const tags = ["Fun", "MQTT", "Lego", "IOT", "Tobias Mühlbauer"];
+const tags = ["Fun", "MQTT", "Lego", "IoT", "Tobias Mühlbauer"];
 const dev = false;
 
 var clientName = "matiix310";

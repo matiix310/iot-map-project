@@ -34,7 +34,32 @@ class Map {
   private socketManager: SocketManager | null = null;
 
   constructor(mqttServer: MqttServer) {
-    this.obstacles = [{ x: 0, y: 0 }];
+    this.obstacles = [
+      // { x: 200, y: 200 },
+      // { x: 200, y: 210 },
+      // { x: 200, y: 220 },
+      // { x: 200, y: 230 },
+      // { x: 210, y: 240 },
+      // { x: 220, y: 250 },
+      // { x: 220, y: 260 },
+      // { x: 220, y: 270 },
+      // { x: 220, y: 290 },
+      // { x: 100, y: 300 },
+      // { x: 120, y: 300 },
+      // { x: 120, y: 300 },
+      // { x: 110, y: 300 },
+      // { x: 110, y: 300 },
+      // { x: 130, y: 320 },
+      // { x: 130, y: 330 },
+      // { x: 140, y: 320 },
+      // { x: 150, y: 310 },
+      // { x: 160, y: 310 },
+      // { x: 170, y: 310 },
+      // { x: 180, y: 310 },
+      // { x: 190, y: 310 },
+      // { x: 200, y: 310 },
+      // { x: 210, y: 300 },
+    ];
     this.pings = [];
     this.currentPing = null;
     this.orientation = 0;
